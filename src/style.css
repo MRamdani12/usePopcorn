@@ -1,0 +1,54 @@
+:root {
+    --primary-color: #d14846;
+    --background-color: white;
+    --dark-background-color: #242424;
+}
+
+@font-face {
+    font-family: noto-sans;
+    src: url("./assets/NotoSans-variable.ttf");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: noto-sans;
+}
+
+button {
+    padding: 12px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    box-shadow: none;
+    color: white;
+    border-radius: 2px;
+    transition: 0.3s all ease;
+    cursor: pointer;
+}
+
+.button-primary {
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+
+    &:hover {
+        background-color: white;
+        color: var(--primary-color);
+    }
+}
+
+.button-secondary {
+    background-color: var(--background-color);
+    border: 1px black solid;
+    color: black;
+
+    &:hover {
+        background-color: black;
+        color: white;
+    }
+}
