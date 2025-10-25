@@ -1,16 +1,10 @@
-import { Button } from "./Button";
-import logo from "../assets/logo-dark.svg";
+import type { ReactNode } from "react";
 
-export function Nav() {
+export function Nav({ children }: { children: ReactNode }) {
     return (
         <nav>
             <div className="container">
-                <div className="nav-wrapper">
-                    <a href="#" className="logo">
-                        <img src={logo} alt="" />
-                    </a>
-                    <Button className="button-primary">Watched List</Button>
-                </div>
+                <div className="nav-wrapper">{children}</div>
             </div>
         </nav>
     );

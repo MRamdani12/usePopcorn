@@ -1,12 +1,19 @@
 :root {
     --primary-color: #c22f2d;
-    --background-color: white;
-    --dark-background-color: #242424;
+    --bg-color: white;
+    --text-color: black;
+}
+
+.dark {
 }
 
 @font-face {
     font-family: noto-sans;
     src: url("./assets/NotoSans-variable.ttf");
+}
+
+input {
+    background-color: transparent;
 }
 
 * {
@@ -52,13 +59,13 @@ button {
     border: 1px solid var(--primary-color);
 
     &:hover {
-        background-color: white;
+        background-color: var(--bg-color);
         color: var(--primary-color);
     }
 }
 
 .button-secondary {
-    background-color: var(--background-color);
+    background-color: var(--bg-color);
     border: 1px black solid;
     color: black;
 
@@ -179,6 +186,7 @@ button {
     z-index: 999;
     background-color: white;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.092);
+    transition: 0.3s all ease;
 
     & .watched-summary {
         background-color: var(--primary-color);
