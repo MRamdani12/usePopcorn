@@ -6,6 +6,9 @@ import { Search } from "./Search";
 import { Sidebar } from "./Sidebar";
 import { WatchedSummary } from "./WatchedSummary";
 import { WatchedMovie } from "./WatchedMovie";
+import { useState } from "react";
+import { Logo } from "./Logo";
+import { Button } from "./Button";
 
 const tempMovieData = [
     {
@@ -62,10 +65,17 @@ const tempWatchedData = [
 ];
 
 export default function App() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     return (
         <>
-            <Nav></Nav>
-            <Sidebar>
+            <Nav>
+                <Logo />
+                <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                    Watched List
+                </Button>
+            </Nav>
+            <Sidebar isSidebarOpen={isSidebarOpen}>
                 <WatchedSummary />
                 <div className="watched-movie-wrapper">
                     {tempWatchedData.map((m) => {
