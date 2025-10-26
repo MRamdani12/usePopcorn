@@ -6,7 +6,7 @@ import { Search } from "./Search";
 import { Sidebar } from "./Sidebar";
 import { WatchedSummary } from "./WatchedSummary";
 import { WatchedMovie } from "./WatchedMovie";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
 
@@ -30,13 +30,13 @@ const tempMovieData = [
         Poster: "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_SX300.jpg",
     },
     {
-        imdbID: "tt6751668",
+        imdbID: "tt675168",
         Title: "Parasite",
         Year: "2019",
         Poster: "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_SX300.jpg",
     },
     {
-        imdbID: "tt6751668",
+        imdbID: "tt651668",
         Title: "Parasite",
         Year: "2019",
         Poster: "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_SX300.jpg",
@@ -63,7 +63,7 @@ const tempWatchedData = [
         userRating: 9,
     },
     {
-        imdbID: "tt0088763",
+        imdbID: "tt088763",
         Title: "Back to the Future",
         Year: "1985",
         Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
@@ -72,7 +72,7 @@ const tempWatchedData = [
         userRating: 9,
     },
     {
-        imdbID: "tt0088763",
+        imdbID: "tt008763",
         Title: "Back to the Future",
         Year: "1985",
         Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
@@ -81,7 +81,7 @@ const tempWatchedData = [
         userRating: 9,
     },
     {
-        imdbID: "tt0088763",
+        imdbID: "t0088763",
         Title: "Back to the Future",
         Year: "1985",
         Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
@@ -90,7 +90,7 @@ const tempWatchedData = [
         userRating: 9,
     },
     {
-        imdbID: "tt0088763",
+        imdbID: "tt0083",
         Title: "Back to the Future",
         Year: "1985",
         Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
@@ -102,20 +102,42 @@ const tempWatchedData = [
 
 export default function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const sidebarRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function clickOutsideSidebar(e: MouseEvent) {
+            const target = e.target as HTMLElement;
+            if (
+                isSidebarOpen &&
+                sidebarRef.current &&
+                !sidebarRef.current.contains(target)
+            ) {
+                setIsSidebarOpen(false);
+            }
+        }
+        const timeout = setTimeout(() => {
+            document.addEventListener("click", clickOutsideSidebar);
+        }, 350);
+
+        return () => {
+            clearTimeout(timeout);
+            document.removeEventListener("click", clickOutsideSidebar);
+        };
+    });
 
     return (
         <>
             <Nav>
                 <Logo />
-                <Button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                <Button onClick={() => setIsSidebarOpen(true)}>
                     Watched List
                 </Button>
             </Nav>
-            <Sidebar isSidebarOpen={isSidebarOpen}>
+            <Sidebar sidebarRef={sidebarRef} isSidebarOpen={isSidebarOpen}>
                 <WatchedSummary />
                 <div className="watched-movie-wrapper">
                     {tempWatchedData.map((m) => {
-                        return <WatchedMovie movie={m} />;
+                        return <WatchedMovie key={m.imdbID} movie={m} />;
                     })}
                 </div>
                 <div className="movie-detail"></div>
