@@ -1,8 +1,8 @@
 type ButtonProps = {
     children: string;
-    /** Enter either 'button-primary' or 'button-secondary' @default button-primary **/
-    className?: "button-primary" | "button-secondary";
-    onClick: () => void;
+    /** Class name for the button @default button-primary **/
+    className?: string;
+    onClick?: () => void;
 };
 
 export function Button({

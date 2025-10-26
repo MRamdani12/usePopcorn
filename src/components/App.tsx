@@ -62,6 +62,42 @@ const tempWatchedData = [
         imdbRating: 8.5,
         userRating: 9,
     },
+    {
+        imdbID: "tt0088763",
+        Title: "Back to the Future",
+        Year: "1985",
+        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
+        runtime: 116,
+        imdbRating: 8.5,
+        userRating: 9,
+    },
+    {
+        imdbID: "tt0088763",
+        Title: "Back to the Future",
+        Year: "1985",
+        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
+        runtime: 116,
+        imdbRating: 8.5,
+        userRating: 9,
+    },
+    {
+        imdbID: "tt0088763",
+        Title: "Back to the Future",
+        Year: "1985",
+        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
+        runtime: 116,
+        imdbRating: 8.5,
+        userRating: 9,
+    },
+    {
+        imdbID: "tt0088763",
+        Title: "Back to the Future",
+        Year: "1985",
+        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
+        runtime: 116,
+        imdbRating: 8.5,
+        userRating: 9,
+    },
 ];
 
 export default function App() {
@@ -83,6 +119,12 @@ export default function App() {
                     })}
                 </div>
                 <div className="movie-detail"></div>
+                <Button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className="sidebar-close button-primary"
+                >
+                    ← Close Watched List
+                </Button>
             </Sidebar>
             <Main>
                 <Search />
