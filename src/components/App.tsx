@@ -9,6 +9,7 @@ import { WatchedMovie } from "./WatchedMovie";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
+import { DarkModeToggle } from "./DarkModeToggle";
 
 const tempMovieData = [
     {
@@ -110,6 +111,7 @@ export default function App() {
             if (
                 isSidebarOpen &&
                 sidebarRef.current &&
+                !target.classList.contains("dark-mode") &&
                 !sidebarRef.current.contains(target)
             ) {
                 setIsSidebarOpen(false);
@@ -156,6 +158,7 @@ export default function App() {
                     })}
                 </MoviesList>
             </Main>
+            <DarkModeToggle />
         </>
     );
 }
