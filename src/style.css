@@ -221,7 +221,7 @@ button {
 .movies-list {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     align-items: start;
     gap: 20px;
 }
@@ -232,6 +232,14 @@ button {
     position: relative;
     border-radius: 6px;
     min-height: 250px;
+    display: flex;
+    align-items: stretch;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-4px);
+    }
 
     & img {
         object-fit: cover;

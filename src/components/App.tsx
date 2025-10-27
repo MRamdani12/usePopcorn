@@ -14,9 +14,9 @@ import { DarkModeToggle } from "./DarkModeToggle";
 const tempMovieData = [
     {
         imdbID: "tt1375666",
-        Title: "Inception",
+        Title: "If Night of the Day of the Dawn of the Son of the Bride of the Return of the Revenge of the Terror of the Attack of the Evil, Mutant, Hellbound, Flesh-Eating Subhumanoid Zombified Living Dead",
         Year: "2010",
-        Poster: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
+        Poster: "https://m.edia-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
     },
     {
         imdbID: "tt0133093",
