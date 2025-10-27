@@ -2,7 +2,7 @@ type ButtonProps = {
     children: string;
     /** Class name for the button @default button-primary **/
     className?: string;
-    onClick?: () => void;
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 export function Button({

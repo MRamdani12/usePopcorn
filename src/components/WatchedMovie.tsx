@@ -1,14 +1,6 @@
-type WatchedMovieProps = {
-    imdbID: string | number;
-    Title: string;
-    Year: string | number;
-    Poster: string;
-    runtime: number;
-    imdbRating: number;
-    userRating: number;
-};
+import type { WatchedMovieType } from "../types/WatchedMovieType";
 
-export function WatchedMovie({ movie }: { movie: WatchedMovieProps }) {
+export function WatchedMovie({ movie }: { movie: WatchedMovieType }) {
     return (
         <div className="watched-movie">
             <img src={movie.Poster} alt="" />
@@ -17,7 +9,7 @@ export function WatchedMovie({ movie }: { movie: WatchedMovieProps }) {
                 <h3 className="watched-movie-title">{movie.Title}</h3>
                 <p>imdbRating: {movie.imdbRating}</p>
                 <p>Personal Rating: {movie.userRating}</p>
-                <p>Duration: {movie.runtime} min</p>
+                <p>Duration: {movie.runtime}</p>
             </div>
         </div>
     );

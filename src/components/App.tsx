@@ -13,63 +13,9 @@ import { DarkModeToggle } from "./DarkModeToggle";
 import type { MovieType } from "../types/MovieType";
 import { PlaceholderBox } from "./PlaceholderBox";
 import { LoadAnimation } from "./LoadAnimation";
-
-const tempWatchedData = [
-    {
-        imdbID: "tt1375666",
-        Title: "Inception",
-        Year: "2010",
-        Poster: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-        runtime: 148,
-        imdbRating: 8.8,
-        userRating: 10,
-    },
-    {
-        imdbID: "tt0088763",
-        Title: "Back to the Future",
-        Year: "1985",
-        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-        runtime: 116,
-        imdbRating: 8.5,
-        userRating: 9,
-    },
-    {
-        imdbID: "tt088763",
-        Title: "Back to the Future",
-        Year: "1985",
-        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-        runtime: 116,
-        imdbRating: 8.5,
-        userRating: 9,
-    },
-    {
-        imdbID: "tt008763",
-        Title: "Back to the Future",
-        Year: "1985",
-        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-        runtime: 116,
-        imdbRating: 8.5,
-        userRating: 9,
-    },
-    {
-        imdbID: "t0088763",
-        Title: "Back to the Future",
-        Year: "1985",
-        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-        runtime: 116,
-        imdbRating: 8.5,
-        userRating: 9,
-    },
-    {
-        imdbID: "tt0083",
-        Title: "Back to the Future",
-        Year: "1985",
-        Poster: "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-        runtime: 116,
-        imdbRating: 8.5,
-        userRating: 9,
-    },
-];
+import { MovieDetail } from "./MovieDetail";
+import { fetchJSON } from "../utility/fetchJSON";
+import type { WatchedMovieType } from "../types/WatchedMovieType";
 
 interface OMDbResponse {
     Search: MovieType[];
@@ -84,14 +30,12 @@ export default function App() {
     const [query, setQuery] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const [selectedId, setSelectedId] = useState("");
+    const [watchedMovie, setWatchedMovie] = useState<WatchedMovieType[]>(() => {
+        const watchedData = localStorage.getItem("watched_data");
+        return watchedData ? JSON.parse(watchedData) : [];
+    });
     const sidebarRef = useRef<HTMLDivElement>(null);
-
-    async function fetchJSON<T>(...args: Parameters<typeof fetch>): Promise<T> {
-        const res = await fetch(...args);
-        console.log(...res.headers);
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-        return res.json() as Promise<T>;
-    }
 
     useEffect(() => {
         const controller = new AbortController();
@@ -131,29 +75,46 @@ export default function App() {
         return () => {
             setError("");
             controller.abort();
+            setMovieList([]);
         };
     }, [query]);
 
     useEffect(() => {
-        function clickOutsideSidebar(e: MouseEvent) {
+        if (!isSidebarOpen) return;
+
+        function clickOutside(e: MouseEvent) {
             const target = e.target as HTMLElement;
             if (
-                isSidebarOpen &&
+                !target.classList.contains("movie-overlay") &&
                 sidebarRef.current &&
                 !sidebarRef.current.contains(target)
             ) {
                 setIsSidebarOpen(false);
             }
         }
+
         const timeout = setTimeout(() => {
-            document.addEventListener("click", clickOutsideSidebar);
+            document.addEventListener("click", clickOutside);
         }, 350);
 
         return () => {
             clearTimeout(timeout);
-            document.removeEventListener("click", clickOutsideSidebar);
+            document.removeEventListener("click", clickOutside);
         };
-    });
+    }, [isSidebarOpen]);
+
+    useEffect(() => {
+        localStorage.setItem("watched_data", JSON.stringify(watchedMovie));
+    }, [watchedMovie]);
+
+    function handleMovieClick(id: string) {
+        setIsSidebarOpen(true);
+        setSelectedId(id);
+    }
+
+    function handleAddMovie(newMovie: WatchedMovieType) {
+        setWatchedMovie([...watchedMovie, newMovie]);
+    }
 
     return (
         <>
@@ -166,11 +127,16 @@ export default function App() {
             <Sidebar sidebarRef={sidebarRef} isSidebarOpen={isSidebarOpen}>
                 <WatchedSummary />
                 <div className="watched-movie-wrapper">
-                    {tempWatchedData.map((m) => {
-                        return <WatchedMovie key={m.imdbID} movie={m} />;
+                    {watchedMovie.map((m) => {
+                        return <WatchedMovie key={m.id} movie={m} />;
                     })}
                 </div>
-                <div className="movie-detail"></div>
+                {selectedId && (
+                    <MovieDetail
+                        onAddWatchedMovie={handleAddMovie}
+                        movieId={selectedId}
+                    />
+                )}
                 <Button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     className="sidebar-close button-primary"
@@ -183,14 +149,20 @@ export default function App() {
                 <MoviesList>
                     {movieList &&
                         movieList.map((m) => {
-                            return <Movie key={m.imdbID} movie={m} />;
+                            return (
+                                <Movie
+                                    onMovieClick={handleMovieClick}
+                                    key={m.imdbID}
+                                    movie={m}
+                                />
+                            );
                         })}
                     {isLoading && !error && (
                         <PlaceholderBox>
                             <LoadAnimation />
                         </PlaceholderBox>
                     )}
-                    {error && <PlaceholderBox>Error: {error}</PlaceholderBox>}
+                    {error && <PlaceholderBox>{error}</PlaceholderBox>}
                     {!query && !error && (
                         <PlaceholderBox>
                             Try searching for something!

@@ -1,5 +1,5 @@
 export type MovieType = {
-    imdbID: string | number;
+    imdbID: string;
     Title: string;
     type: string;
     Year: string | number;

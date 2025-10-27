@@ -301,7 +301,7 @@ button {
 }
 
 .sidebar {
-    width: 450px;
+    width: 500px;
     height: 100vh;
     position: fixed;
     right: 0;
@@ -311,6 +311,7 @@ button {
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.092);
     transition: 0.3s all ease;
     padding-bottom: 32px;
+    border-left: 1px solid var(--border-color);
 
     & .watched-summary {
         background-color: var(--primary-color);
@@ -331,6 +332,18 @@ button {
         padding: 18px;
         overflow-y: auto;
         position: relative;
+    }
+
+    & .movie-detail {
+        position: absolute;
+        background-color: var(--bg-color);
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
     }
 
     & .sidebar-close {
@@ -366,6 +379,84 @@ button {
     }
 }
 
+.movie-detail header {
+    width: 100%;
+    padding: 36px 24px;
+    background-color: var(--primary-color);
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+
+    & .img-wrapper {
+        height: 100%;
+        width: 35%;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+        flex-shrink: 0;
+
+        & img {
+            border-radius: 4px;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            border: none;
+        }
+    }
+
+    & .movie-detail-summary {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    & h2 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+}
+
+.movie-detail .movie-detail-body {
+    display: flex;
+    justify-content: start;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+    & .movie-detail-plot {
+        line-height: 1.6rem;
+    }
+
+    & .star-rating {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 30px 20px;
+        border-radius: 4px;
+        background-color: var(--primary-color);
+
+        & p {
+            color: #efbf04;
+            font-size: 1.2rem;
+            width: 20px;
+        }
+
+        & .star-style {
+            display: inline;
+            background-color: transparent;
+            border: none;
+            padding: 0;
+        }
+    }
+}
+
 .load-container {
     display: flex;
     gap: 10px;
@@ -373,7 +464,7 @@ button {
         width: 10px;
         height: 10px;
         border-radius: 2px;
-        background-color: var(--text-color);
+        background-color: white;
         opacity: 0.3;
         animation: 0.5s ease-in alternate infinite loading;
     }

@@ -1,8 +1,13 @@
 import type { MovieType } from "../types/MovieType";
 
-export function Movie({ movie }: { movie: MovieType }) {
+type MovieProps = {
+    movie: MovieType;
+    onMovieClick: (id: string) => void;
+};
+
+export function Movie({ movie, onMovieClick }: MovieProps) {
     return (
-        <div className="movie">
+        <div className="movie" onClick={() => onMovieClick(movie.imdbID)}>
             <div className="movie-overlay">
                 <p className="movie-name">{movie.Title}</p>
                 <div className="movie-year">{movie.Year}</div>
