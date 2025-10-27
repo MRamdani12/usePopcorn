@@ -115,7 +115,8 @@ button {
     border-radius: 999px;
     box-shadow: 2px 2px 15px rgba(0, 0, 0, 0.144);
     border: 1px solid var(--border-color);
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    z-index: 999;
 
     &:hover {
         height: 185px;
@@ -159,7 +160,7 @@ button {
         width: 54px;
         height: 54px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
         border: 1px solid rgba(0, 0, 0, 0);
     }
 

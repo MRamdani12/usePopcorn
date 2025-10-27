@@ -3,19 +3,12 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 
 /* import all the icons in Free Solid, Free Regular, and Brands styles */
 import { fas } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useDarkMode } from "../hooks/useDarkMode";
 
 library.add(fas);
 
 export function DarkModeToggle() {
-    const [darkMode, setDarkMode] = useState(() => {
-        return localStorage.getItem("theme") === "dark";
-    });
-
-    useEffect(() => {
-        document.body.classList.toggle("dark", darkMode);
-        localStorage.setItem("theme", darkMode ? "dark" : "light");
-    }, [darkMode]);
+    const [darkMode, setDarkMode] = useDarkMode();
 
     return (
         <div className="dark-mode">
@@ -40,11 +33,19 @@ export function DarkModeToggle() {
                 </span>
             </div>
             <div className="active-mode">
-                <FontAwesomeIcon
-                    icon={["fas", "sun"]}
-                    size="lg"
-                    style={{ color: "white" }}
-                />
+                {darkMode ? (
+                    <FontAwesomeIcon
+                        icon={["fas", "moon"]}
+                        size="lg"
+                        style={{ color: "white" }}
+                    />
+                ) : (
+                    <FontAwesomeIcon
+                        icon={["fas", "sun"]}
+                        size="lg"
+                        style={{ color: "white" }}
+                    />
+                )}
             </div>
         </div>
     );
