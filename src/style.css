@@ -221,7 +221,7 @@ button {
 .movies-list {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     align-items: start;
     gap: 20px;
 }
@@ -234,6 +234,7 @@ button {
     min-height: 250px;
     display: flex;
     align-items: stretch;
+    justify-content: center;
     transition: all 0.3s ease;
     cursor: pointer;
 
@@ -247,6 +248,16 @@ button {
         height: 100%;
         aspect-ratio: 2/3;
         border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: linear-gradient(
+            120deg,
+            rgba(49, 49, 49, 0.5),
+            rgba(0, 0, 0, 1)
+        );
+        color: white;
     }
 }
 
@@ -266,7 +277,7 @@ button {
     }
 
     & .movie-year {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(0, 0, 0, 0.5);
         position: absolute;
         top: 10px;
         left: 10px;
@@ -275,6 +286,18 @@ button {
         backdrop-filter: blur(3px);
         color: white;
     }
+}
+
+.placeholder-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    grid-column: 1 / -1;
+    height: 300px;
+    font-size: 1.5rem;
 }
 
 .sidebar {
@@ -340,5 +363,45 @@ button {
     &:hover {
         transform: translateY(0px);
         box-shadow: none;
+    }
+}
+
+.load-container {
+    display: flex;
+    gap: 10px;
+    & .load-period {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        background-color: var(--text-color);
+        opacity: 0.3;
+        animation: 0.5s ease-in alternate infinite loading;
+    }
+
+    & .load-period:nth-child(1) {
+        animation-delay: 0.2s;
+    }
+
+    & .load-period:nth-child(2) {
+        animation-delay: 0.4s;
+    }
+
+    & .load-period:nth-child(3) {
+        animation-delay: 0.6s;
+    }
+
+    & .load-period:nth-child(4) {
+        animation-delay: 0.8s;
+    }
+}
+
+@keyframes loading {
+    from {
+        opacity: 0.2;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-5px) scale(1.1);
     }
 }

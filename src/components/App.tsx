@@ -10,39 +10,9 @@ import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
 import { DarkModeToggle } from "./DarkModeToggle";
-
-const tempMovieData = [
-    {
-        imdbID: "tt1375666",
-        Title: "If Night of the Day of the Dawn of the Son of the Bride of the Return of the Revenge of the Terror of the Attack of the Evil, Mutant, Hellbound, Flesh-Eating Subhumanoid Zombified Living Dead",
-        Year: "2010",
-        Poster: "https://m.edia-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    },
-    {
-        imdbID: "tt0133093",
-        Title: "The Matrix",
-        Year: "1999",
-        Poster: "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX300.jpg",
-    },
-    {
-        imdbID: "tt6751668",
-        Title: "Parasite",
-        Year: "2019",
-        Poster: "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_SX300.jpg",
-    },
-    {
-        imdbID: "tt675168",
-        Title: "Parasite",
-        Year: "2019",
-        Poster: "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_SX300.jpg",
-    },
-    {
-        imdbID: "tt651668",
-        Title: "Parasite",
-        Year: "2019",
-        Poster: "https://m.media-amazon.com/images/M/MV5BNWE5MGI3MDctMmU5Ni00YzI2LWEzMTQtZGIyZDA5MzQzNDBhXkEyXkFqcGc@._V1_SX300.jpg",
-    },
-];
+import type { MovieType } from "../types/MovieType";
+import { PlaceholderBox } from "./PlaceholderBox";
+import { LoadAnimation } from "./LoadAnimation";
 
 const tempWatchedData = [
     {
@@ -101,9 +71,68 @@ const tempWatchedData = [
     },
 ];
 
+interface OMDbResponse {
+    Search: MovieType[];
+    totalResults: string;
+    Response: "True" | "False";
+    Error?: string;
+}
+
 export default function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [movieList, setMovieList] = useState<MovieType[]>([]);
+    const [query, setQuery] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
     const sidebarRef = useRef<HTMLDivElement>(null);
+
+    async function fetchJSON<T>(...args: Parameters<typeof fetch>): Promise<T> {
+        const res = await fetch(...args);
+        console.log(...res.headers);
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+        return res.json() as Promise<T>;
+    }
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        if (query.length <= 2) {
+            setMovieList([]);
+            return;
+        }
+
+        async function fetchData() {
+            try {
+                setIsLoading(true);
+
+                const data = await fetchJSON<OMDbResponse>(
+                    `http://www.omdbapi.com/?apikey=${
+                        import.meta.env.VITE_OMDB_API_KEY
+                    }&s=${query}`,
+                    { signal: controller.signal }
+                );
+
+                if (data.Error) throw new Error("Movie not found");
+
+                setMovieList(data.Search);
+            } catch (error) {
+                if (typeof error === "string") {
+                    setError(error);
+                } else if (error instanceof Error) {
+                    if (error.message.includes("abort")) return;
+                    setError(error.message);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchData().catch((err) => console.error(err));
+        return () => {
+            setError("");
+            controller.abort();
+        };
+    }, [query]);
 
     useEffect(() => {
         function clickOutsideSidebar(e: MouseEvent) {
@@ -111,7 +140,6 @@ export default function App() {
             if (
                 isSidebarOpen &&
                 sidebarRef.current &&
-                !target.classList.contains("dark-mode") &&
                 !sidebarRef.current.contains(target)
             ) {
                 setIsSidebarOpen(false);
@@ -151,11 +179,28 @@ export default function App() {
                 </Button>
             </Sidebar>
             <Main>
-                <Search />
+                <Search query={query} setQuery={setQuery} />
                 <MoviesList>
-                    {tempMovieData.map((m) => {
-                        return <Movie key={m.imdbID} movie={m} />;
-                    })}
+                    {movieList &&
+                        movieList.map((m) => {
+                            return <Movie key={m.imdbID} movie={m} />;
+                        })}
+                    {isLoading && !error && (
+                        <PlaceholderBox>
+                            <LoadAnimation />
+                        </PlaceholderBox>
+                    )}
+                    {error && <PlaceholderBox>Error: {error}</PlaceholderBox>}
+                    {!query && !error && (
+                        <PlaceholderBox>
+                            Try searching for something!
+                        </PlaceholderBox>
+                    )}
+                    {query.length <= 2 && query.length >= 1 && (
+                        <PlaceholderBox>
+                            Input need to be more than 1-2 character(s)
+                        </PlaceholderBox>
+                    )}
                 </MoviesList>
             </Main>
             <DarkModeToggle />
