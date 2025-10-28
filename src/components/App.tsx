@@ -129,34 +129,30 @@ export default function App() {
                 </Button>
             </Nav>
             <Sidebar sidebarRef={sidebarRef} isSidebarOpen={isSidebarOpen}>
-                {selectedId ? (
+                <WatchedSummary />
+                <div className="watched-movie-wrapper">
+                    {watchedMovie.map((m) => {
+                        return (
+                            <WatchedMovie
+                                onDeleteMovie={handleRemoveMovie}
+                                key={m.id}
+                                movie={m}
+                            />
+                        );
+                    })}
+                </div>
+                {selectedId && (
                     <MovieDetail
                         onAddWatchedMovie={handleAddMovie}
                         movieId={selectedId}
                     />
-                ) : (
-                    <>
-                        <WatchedSummary />
-
-                        <div className="watched-movie-wrapper">
-                            {watchedMovie.map((m) => {
-                                return (
-                                    <WatchedMovie
-                                        onDeleteMovie={handleRemoveMovie}
-                                        key={m.id}
-                                        movie={m}
-                                    />
-                                );
-                            })}
-                        </div>
-                        <Button
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="sidebar-close button-primary"
-                        >
-                            ← Close Watched List
-                        </Button>
-                    </>
                 )}
+                <Button
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    className="sidebar-close button-primary"
+                >
+                    ← Close Watched List
+                </Button>
             </Sidebar>
             <Main>
                 <Search query={query} setQuery={setQuery} />
