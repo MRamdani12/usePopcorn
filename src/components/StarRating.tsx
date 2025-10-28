@@ -33,7 +33,6 @@ export function StarRating({
 
     return (
         <div className="star-rating">
-            {rating}
             <div className="stars">
                 {Array.from({ length }, (_, i) => {
                     const isFull = tempRating ? i < tempRating : i < rating;

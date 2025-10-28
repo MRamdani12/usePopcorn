@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SetStateAction } from "react";
 import { Button } from "./Button";
 import { StarRating } from "./StarRating";
 import { fetchJSON } from "../utility/fetchJSON";
@@ -10,18 +10,27 @@ import type { WatchedMovieType } from "../types/WatchedMovieType";
 type MovieDetailProps = {
     movieId: string;
     onAddWatchedMovie: (newMovie: WatchedMovieType) => void;
+    isOpen: boolean;
+    setIsOpen: React.Dispatch<SetStateAction<boolean>>;
+    isRated: boolean;
 };
 
-export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
+export function MovieDetail({
+    movieId,
+    onAddWatchedMovie,
+    isOpen,
+    setIsOpen,
+    isRated,
+}: MovieDetailProps) {
     const [movieDetail, setMovieDetail] = useState<MovieDetailType | null>(
         null
     );
     const [isLoading, setIsLoading] = useState(true);
-    const [isOpen, setIsOpen] = useState(false);
     const [rating, setRating] = useState(0);
 
     useEffect(() => {
         if (!movieId) return;
+        setRating(0);
         const controller = new AbortController();
         async function getMovieDetail() {
             setIsLoading(true);
@@ -45,7 +54,7 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
         return () => {
             controller.abort();
         };
-    }, [movieId]);
+    }, [movieId, setIsOpen]);
 
     function handleAddWatched(e: React.MouseEvent<HTMLButtonElement>) {
         if (!movieDetail) return;
@@ -57,6 +66,7 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
             runtime: movieDetail?.Runtime,
             imdbRating: movieDetail?.imdbRating,
             userRating: rating,
+            imdbId: movieId,
         };
 
         setIsOpen(false);
@@ -72,7 +82,6 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
         <>
             {isOpen && (
                 <div className="movie-detail">
-                    {rating}
                     {isLoading && (
                         <PlaceholderBox className={"movie-detail-loading"}>
                             <LoadAnimation />
@@ -95,17 +104,26 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
                             <p>{movieDetail?.imdbRating} IMDb rating ⭐️</p>
                         </div>
                     </header>
+
                     <div className="movie-detail-body">
-                        <StarRating
-                            key={movieDetail?.Title}
-                            ratingFn={handleRating}
-                            length={10}
-                        />
-                        {rating ? (
-                            <Button onClick={handleAddWatched}>
-                                + Add To List
-                            </Button>
-                        ) : null}
+                        {isRated ? (
+                            <div className="rated-movie-placeholder">
+                                You already rated this movie
+                            </div>
+                        ) : (
+                            <>
+                                <StarRating
+                                    key={movieDetail?.Title}
+                                    ratingFn={handleRating}
+                                    length={10}
+                                />
+                                {rating ? (
+                                    <Button onClick={handleAddWatched}>
+                                        + Add To List
+                                    </Button>
+                                ) : null}
+                            </>
+                        )}
                         <div className="movie-detail-plot">
                             {movieDetail?.Plot}
                         </div>

@@ -4,11 +4,19 @@ import { Button } from "./Button";
 type WatchedMovieProps = {
     movie: WatchedMovieType;
     onDeleteMovie: (movieId: string) => void;
+    onWatchedClick: (movieId: string) => void;
 };
 
-export function WatchedMovie({ movie, onDeleteMovie }: WatchedMovieProps) {
+export function WatchedMovie({
+    movie,
+    onDeleteMovie,
+    onWatchedClick,
+}: WatchedMovieProps) {
     return (
-        <div className="watched-movie">
+        <div
+            className="watched-movie"
+            onClick={() => onWatchedClick(movie.imdbId)}
+        >
             <Button
                 onClick={(e) => {
                     e.stopPropagation();
@@ -18,7 +26,7 @@ export function WatchedMovie({ movie, onDeleteMovie }: WatchedMovieProps) {
             >
                 ✖
             </Button>
-            <img src={movie.Poster} alt="" />
+            <img src={movie.Poster} alt={movie.Title} />
 
             <div className="watched-movie-detail">
                 <h3 className="watched-movie-title">{movie.Title}</h3>

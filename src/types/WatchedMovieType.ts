@@ -5,4 +5,5 @@ export type WatchedMovieType = {
     runtime: string;
     imdbRating: string;
     userRating: number;
+    imdbId: string;
 };

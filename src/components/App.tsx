@@ -24,6 +24,10 @@ interface OMDbResponse {
     Error?: string;
 }
 
+const average = (arr: Array<number>) => {
+    return arr.reduce((acc, curr, _, arr) => acc + curr / arr.length, 0);
+};
+
 export default function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [movieList, setMovieList] = useState<MovieType[]>([]);
@@ -35,7 +39,9 @@ export default function App() {
         const watchedData = localStorage.getItem("watched_data");
         return watchedData ? JSON.parse(watchedData) : [];
     });
+    const [watchedDetailOpen, setWatchedDetailOpen] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -64,6 +70,12 @@ export default function App() {
                     setError(error);
                 } else if (error instanceof Error) {
                     if (error.message.includes("abort")) return;
+                    if (error.message.includes("401")) {
+                        setError(
+                            "It looks like my API key has reached 1000 request, try again tomorrow!"
+                        );
+                        return;
+                    }
                     setError(error.message);
                 }
             }
@@ -74,6 +86,7 @@ export default function App() {
             setError("");
             controller.abort();
             setMovieList([]);
+            setIsLoading(false);
         };
     }, [query]);
 
@@ -88,6 +101,7 @@ export default function App() {
                 !sidebarRef.current.contains(target)
             ) {
                 setIsSidebarOpen(false);
+                setWatchedDetailOpen(false);
             }
         }
 
@@ -105,6 +119,32 @@ export default function App() {
         localStorage.setItem("watched_data", JSON.stringify(watchedMovie));
     }, [watchedMovie]);
 
+    useEffect(() => {
+        if (!watchedDetailOpen) return;
+        const currTitle = movieList
+            .filter((w) => w.imdbID === selectedId)
+            .at(0)?.Title;
+
+        document.title = `usePopcorn ${currTitle ? `| ${currTitle}` : ""}`;
+
+        return () => {
+            document.title = "usePopcorn";
+        };
+    }, [movieList, selectedId, watchedDetailOpen]);
+
+    useEffect(() => {
+        function pressEnter(e: KeyboardEvent) {
+            if (e.code === "Enter" && searchRef.current) {
+                searchRef.current.focus();
+            }
+        }
+        document.addEventListener("keydown", pressEnter);
+
+        return () => {
+            document.removeEventListener("keydown", pressEnter);
+        };
+    }, []);
+
     function handleMovieClick(id: string) {
         setIsSidebarOpen(true);
         setSelectedId(id);
@@ -120,6 +160,12 @@ export default function App() {
         setWatchedMovie(newMovie);
     }
 
+    function handleWatchedClick(movieId: string) {
+        setWatchedDetailOpen(!watchedDetailOpen);
+        setSelectedId(movieId);
+        console.log(movieId);
+    }
+
     return (
         <>
             <Nav>
@@ -129,7 +175,19 @@ export default function App() {
                 </Button>
             </Nav>
             <Sidebar sidebarRef={sidebarRef} isSidebarOpen={isSidebarOpen}>
-                <WatchedSummary />
+                <WatchedSummary
+                    movieCount={watchedMovie.length}
+                    avgImdbRating={average(
+                        watchedMovie.map((w) => Number(w.imdbRating))
+                    )}
+                    avgUserRating={average(
+                        watchedMovie.map((w) => Number(w.userRating))
+                    )}
+                    avgRuntime={average(
+                        watchedMovie.map((w) => Number(w.runtime.split(" ")[0]))
+                    )}
+                />
+
                 <div className="watched-movie-wrapper">
                     {watchedMovie.map((m) => {
                         return (
@@ -137,26 +195,36 @@ export default function App() {
                                 onDeleteMovie={handleRemoveMovie}
                                 key={m.id}
                                 movie={m}
+                                onWatchedClick={handleWatchedClick}
                             />
                         );
                     })}
                 </div>
-                {selectedId && (
-                    <MovieDetail
-                        onAddWatchedMovie={handleAddMovie}
-                        movieId={selectedId}
-                    />
-                )}
+
                 <Button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                     className="sidebar-close button-primary"
                 >
                     ← Close Watched List
                 </Button>
+                {selectedId && (
+                    <MovieDetail
+                        onAddWatchedMovie={handleAddMovie}
+                        movieId={selectedId}
+                        isOpen={watchedDetailOpen}
+                        setIsOpen={setWatchedDetailOpen}
+                        isRated={watchedMovie.some(
+                            (w) => w.imdbId === selectedId
+                        )}
+                    />
+                )}
             </Sidebar>
             <Main>
-                <Search query={query} setQuery={setQuery} />
-                {String(isLoading)}
+                <Search
+                    searchRef={searchRef}
+                    query={query}
+                    setQuery={setQuery}
+                />
 
                 <MoviesList>
                     {movieList &&
