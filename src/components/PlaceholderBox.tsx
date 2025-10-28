@@ -1,13 +1,9 @@
 export function PlaceholderBox({
     children,
-    height,
+    className,
 }: {
     children: React.ReactNode;
-    height?: number;
+    className?: string;
 }) {
-    return (
-        <div style={{ height: `${height}%` }} className="placeholder-box">
-            {children}
-        </div>
-    );
+    return <div className={`placeholder-box ${className}`}>{children}</div>;
 }

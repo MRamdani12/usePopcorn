@@ -16,15 +16,17 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
     const [movieDetail, setMovieDetail] = useState<MovieDetailType | null>(
         null
     );
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [rating, setRating] = useState(0);
 
     useEffect(() => {
+        if (!movieId) return;
         const controller = new AbortController();
         async function getMovieDetail() {
+            setIsLoading(true);
+
             try {
-                setIsLoading(true);
                 const data = await fetchJSON<MovieDetailType>(
                     `https://www.omdbapi.com/?i=${movieId}&apikey=${
                         import.meta.env.VITE_OMDB_API_KEY
@@ -32,21 +34,16 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
                     { signal: controller.signal }
                 );
                 setMovieDetail(data);
+                setIsLoading(false);
             } catch (err) {
                 console.error(err);
-            } finally {
-                setIsLoading(false);
             }
         }
-        const timer = window.setTimeout(() => {
-            getMovieDetail().catch(console.error);
-        }, 0);
+        getMovieDetail().catch(console.error);
         setIsOpen(true);
 
         return () => {
-            setRating(0);
             controller.abort();
-            clearTimeout(timer);
         };
     }, [movieId]);
 
@@ -67,58 +64,61 @@ export function MovieDetail({ movieId, onAddWatchedMovie }: MovieDetailProps) {
         onAddWatchedMovie(newMovie);
     }
 
+    function handleRating(rating: number) {
+        setRating(rating);
+    }
+
     return (
         <>
             {isOpen && (
                 <div className="movie-detail">
-                    {isLoading ? (
-                        <PlaceholderBox height={100}>
+                    {rating}
+                    {isLoading && (
+                        <PlaceholderBox className={"movie-detail-loading"}>
                             <LoadAnimation />
                         </PlaceholderBox>
-                    ) : (
-                        <>
-                            <header>
-                                <div className="img-wrapper">
-                                    <img
-                                        src={movieDetail?.Poster}
-                                        alt={movieDetail?.Title}
-                                    />
-                                </div>
-                                <div className="movie-detail-summary">
-                                    <h2>{movieDetail?.Title}</h2>
-                                    <p>
-                                        {movieDetail?.Released} •{" "}
-                                        {movieDetail?.Runtime}
-                                    </p>
-                                    <p>{movieDetail?.Genre}</p>
-                                    <p>
-                                        {movieDetail?.imdbRating} IMDb rating
-                                        ⭐️
-                                    </p>
-                                </div>
-                            </header>
-                            <div className="movie-detail-body">
-                                <StarRating ratingFn={setRating} length={10} />
-                                {rating ? (
-                                    <Button onClick={handleAddWatched}>
-                                        + Add To List
-                                    </Button>
-                                ) : null}
-                                <div className="movie-detail-plot">
-                                    {movieDetail?.Plot}
-                                </div>
-                            </div>
-                            <Button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setIsOpen(false);
-                                }}
-                                className="sidebar-close button-primary"
-                            >
-                                ← Close Movie Detail
-                            </Button>
-                        </>
                     )}
+
+                    <header>
+                        <div className="img-wrapper">
+                            <img
+                                src={movieDetail?.Poster}
+                                alt={movieDetail?.Title}
+                            />
+                        </div>
+                        <div className="movie-detail-summary">
+                            <h2>{movieDetail?.Title}</h2>
+                            <p>
+                                {movieDetail?.Released} • {movieDetail?.Runtime}
+                            </p>
+                            <p>{movieDetail?.Genre}</p>
+                            <p>{movieDetail?.imdbRating} IMDb rating ⭐️</p>
+                        </div>
+                    </header>
+                    <div className="movie-detail-body">
+                        <StarRating
+                            key={movieDetail?.Title}
+                            ratingFn={handleRating}
+                            length={10}
+                        />
+                        {rating ? (
+                            <Button onClick={handleAddWatched}>
+                                + Add To List
+                            </Button>
+                        ) : null}
+                        <div className="movie-detail-plot">
+                            {movieDetail?.Plot}
+                        </div>
+                    </div>
+                    <Button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIsOpen(false);
+                        }}
+                        className="sidebar-close button-primary"
+                    >
+                        ← Close Movie Detail
+                    </Button>
                 </div>
             )}
         </>

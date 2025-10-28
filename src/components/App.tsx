@@ -57,8 +57,8 @@ export default function App() {
                 );
 
                 if (data.Error) throw new Error("Movie not found");
-
                 setMovieList(data.Search);
+                setIsLoading(false);
             } catch (error) {
                 if (typeof error === "string") {
                     setError(error);
@@ -66,12 +66,10 @@ export default function App() {
                     if (error.message.includes("abort")) return;
                     setError(error.message);
                 }
-            } finally {
-                setIsLoading(false);
             }
         }
 
-        fetchData().catch((err) => console.error(err));
+        fetchData();
         return () => {
             setError("");
             controller.abort();
@@ -116,6 +114,12 @@ export default function App() {
         setWatchedMovie([...watchedMovie, newMovie]);
     }
 
+    function handleRemoveMovie(movieId: string) {
+        const newMovie = watchedMovie.filter((m) => m.id !== movieId);
+
+        setWatchedMovie(newMovie);
+    }
+
     return (
         <>
             <Nav>
@@ -125,27 +129,39 @@ export default function App() {
                 </Button>
             </Nav>
             <Sidebar sidebarRef={sidebarRef} isSidebarOpen={isSidebarOpen}>
-                <WatchedSummary />
-                <div className="watched-movie-wrapper">
-                    {watchedMovie.map((m) => {
-                        return <WatchedMovie key={m.id} movie={m} />;
-                    })}
-                </div>
-                {selectedId && (
+                {selectedId ? (
                     <MovieDetail
                         onAddWatchedMovie={handleAddMovie}
                         movieId={selectedId}
                     />
+                ) : (
+                    <>
+                        <WatchedSummary />
+
+                        <div className="watched-movie-wrapper">
+                            {watchedMovie.map((m) => {
+                                return (
+                                    <WatchedMovie
+                                        onDeleteMovie={handleRemoveMovie}
+                                        key={m.id}
+                                        movie={m}
+                                    />
+                                );
+                            })}
+                        </div>
+                        <Button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="sidebar-close button-primary"
+                        >
+                            ← Close Watched List
+                        </Button>
+                    </>
                 )}
-                <Button
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="sidebar-close button-primary"
-                >
-                    ← Close Watched List
-                </Button>
             </Sidebar>
             <Main>
                 <Search query={query} setQuery={setQuery} />
+                {String(isLoading)}
+
                 <MoviesList>
                     {movieList &&
                         movieList.map((m) => {

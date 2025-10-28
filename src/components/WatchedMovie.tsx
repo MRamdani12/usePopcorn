@@ -1,8 +1,23 @@
 import type { WatchedMovieType } from "../types/WatchedMovieType";
+import { Button } from "./Button";
 
-export function WatchedMovie({ movie }: { movie: WatchedMovieType }) {
+type WatchedMovieProps = {
+    movie: WatchedMovieType;
+    onDeleteMovie: (movieId: string) => void;
+};
+
+export function WatchedMovie({ movie, onDeleteMovie }: WatchedMovieProps) {
     return (
         <div className="watched-movie">
+            <Button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteMovie(movie.id);
+                }}
+                className="button-close"
+            >
+                ✖
+            </Button>
             <img src={movie.Poster} alt="" />
 
             <div className="watched-movie-detail">
