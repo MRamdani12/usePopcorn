@@ -10,19 +10,12 @@ import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
 import { DarkModeToggle } from "./DarkModeToggle";
-import type { MovieType } from "../types/MovieType";
 import { PlaceholderBox } from "./PlaceholderBox";
 import { LoadAnimation } from "./LoadAnimation";
 import { MovieDetail } from "./MovieDetail";
-import { fetchJSON } from "../utility/fetchJSON";
 import type { WatchedMovieType } from "../types/WatchedMovieType";
-
-interface OMDbResponse {
-    Search: MovieType[];
-    totalResults: string;
-    Response: "True" | "False";
-    Error?: string;
-}
+import { useMovies } from "./useMovies";
+import { useKey } from "./useKey";
 
 const average = (arr: Array<number>) => {
     return arr.reduce((acc, curr, _, arr) => acc + curr / arr.length, 0);
@@ -30,10 +23,7 @@ const average = (arr: Array<number>) => {
 
 export default function App() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [movieList, setMovieList] = useState<MovieType[]>([]);
     const [query, setQuery] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
     const [selectedId, setSelectedId] = useState("");
     const [watchedMovie, setWatchedMovie] = useState<WatchedMovieType[]>(() => {
         const watchedData = localStorage.getItem("watched_data");
@@ -43,52 +33,12 @@ export default function App() {
     const sidebarRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        const controller = new AbortController();
-
-        if (query.length <= 2) {
-            setMovieList([]);
-            return;
+    const [isLoading, error, movieList] = useMovies(query);
+    useKey("enter", () => {
+        if (searchRef.current) {
+            searchRef.current.focus();
         }
-
-        async function fetchData() {
-            try {
-                setIsLoading(true);
-
-                const data = await fetchJSON<OMDbResponse>(
-                    `http://www.omdbapi.com/?apikey=${
-                        import.meta.env.VITE_OMDB_API_KEY
-                    }&s=${query}`,
-                    { signal: controller.signal }
-                );
-
-                if (data.Error) throw new Error("Movie not found");
-                setMovieList(data.Search);
-                setIsLoading(false);
-            } catch (error) {
-                if (typeof error === "string") {
-                    setError(error);
-                } else if (error instanceof Error) {
-                    if (error.message.includes("abort")) return;
-                    if (error.message.includes("401")) {
-                        setError(
-                            "It looks like my API key has reached 1000 request, try again tomorrow!"
-                        );
-                        return;
-                    }
-                    setError(error.message);
-                }
-            }
-        }
-
-        fetchData();
-        return () => {
-            setError("");
-            controller.abort();
-            setMovieList([]);
-            setIsLoading(false);
-        };
-    }, [query]);
+    });
 
     useEffect(() => {
         if (!isSidebarOpen) return;
@@ -131,19 +81,6 @@ export default function App() {
             document.title = "usePopcorn";
         };
     }, [movieList, selectedId, watchedDetailOpen]);
-
-    useEffect(() => {
-        function pressEnter(e: KeyboardEvent) {
-            if (e.code === "Enter" && searchRef.current) {
-                searchRef.current.focus();
-            }
-        }
-        document.addEventListener("keydown", pressEnter);
-
-        return () => {
-            document.removeEventListener("keydown", pressEnter);
-        };
-    }, []);
 
     function handleMovieClick(id: string) {
         setIsSidebarOpen(true);
