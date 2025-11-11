@@ -27,7 +27,7 @@ export function useMovies(query: string): [boolean, string, MovieType[]] {
                 setIsLoading(true);
 
                 const data = await fetchJSON<OMDbResponse>(
-                    `http://www.omdbapi.com/?apikey=${
+                    `https://www.omdbapi.com/?apikey=${
                         import.meta.env.VITE_OMDB_API_KEY
                     }&s=${query}`,
                     { signal: controller.signal }
